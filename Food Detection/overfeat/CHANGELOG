@@ -1,0 +1,46 @@
+version 3:
+	- Fix Makefile for Mac OS.
+	- The torch wrapper now takes inputs images where the pixel values go from 0 to 1 (it used to be from 0 to 255) to harmonize with the torch image library.
+	- The option -f now returns the output of layer 18 (it used to be layer 16), so that the output should have size 4096x1x1 if the input has size 3x231x231.
+	- Add python wrapper.
+	- Add Mac OS binaries.
+
+version 3.1:
+	- Fix overfeat script so that the correct layer is produced for the large network.
+
+version 3.2:
+	- Fix bug in python wrapper that caused some images to be incorrectly loaded.
+	- Better python wrapper sample script.
+
+version 3.3:
+	- Fix overfeat script that resized the images even when extracting the features.
+	- Changed the default output layer of the overfeat script when using feature extraction.
+	- Separate files from weights and add download_weights.py script to download the weights.
+
+version 3.4:
+	- Added binaries for linux 32 bits.
+	- Fixed wrong output layer in overseat with option -f.
+
+version 3.5:
+	- Fix LD_LIBRARY_PATH in overfeat script.
+	- Add git repository.
+
+version 3.6:
+	- Fix ppm images reading that didn't support comments in the ppm image.
+	- Fix wrong paths in overfeat_batch.
+	- Fix layer numbers in README.
+
+version 4.0:
+	- Released binaries for GPU (only for linux 64bits for now).
+	- Removed dependency to torch by adding local copy of lib TH.
+	- Replaced dynamic library libTH.so by static library libTH.a.
+	- Fix bug in webcam script.
+	- Fixed ambiguous dependency to openblas : now, linux uses openblas and macos uses Accelerate.
+	- Mac OS should correctly use OpenMP now.
+
+version 4.1:
+	- Fix python API
+	- Add missing file for cuda C++ API
+
+version 4.2:
+	- Fix GPU feature extractor

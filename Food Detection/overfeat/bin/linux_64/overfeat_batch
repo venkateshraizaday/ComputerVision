@@ -1,0 +1,58 @@
+#!/usr/bin/python
+
+from optparse import OptionParser
+import os, string, subprocess, sys, os.path
+
+file_dir = os.path.dirname(os.path.abspath(__file__))
+
+parser = OptionParser()
+parser.description = "See README.md for more details"
+parser.add_option("-d", "--data_dir", dest="data_dir", action="store", default=None, help="Path to the folder containing the model data")
+parser.add_option("-i", "--input_dir", dest="input_dir", action="store", help="Input directory")
+parser.add_option("-o", "--output_dir", dest="output_dir", action="store", help="output directory")
+parser.add_option("-l", "--large_net", dest="large_net", action="store_true", default=False, help="Use larger but slower network")
+(options, args) = parser.parse_args()
+
+if (options.input_dir == None) or (options.output_dir == None):
+   parser.print_help()
+   sys.exit(0)
+
+net_idx = 1 if options.large_net else 0
+
+weight_file = None
+if (options.data_dir != None) and (not os.path.exists(options.data_dir)):
+   print >> sys.stderr, "Specified path to data (%s) does not exist"%(options.data_dir)
+   sys.exit(0)
+   weight_file = options.data_dir
+   if not os.path.exists(os.path.join(weight_file, "net_weight_%d"%(net_idx))):
+      print >> sys.stderr, "File %s does not exists. Please check the path you specified with option -d"%(weight_file)
+
+if not os.path.exists(options.input_dir):
+    print >> sys.stderr, "Input directory doesn't exist"
+    sys.exit(0)
+if not os.path.exists(options.output_dir):
+    os.mkdir(options.output_dir)
+
+toprocess = os.listdir(options.input_dir)
+toprocess_input = [os.path.join(options.input_dir, x) for x in toprocess]
+
+p = subprocess.Popen("convert %s ppm:- | %s/overfeat %s %s -p -f"%(string.join(toprocess_input, " "), file_dir, "-l" if options.large_net else "", "" if weight_file == None else "-d %s"%weight_file),
+                     stderr=sys.stderr, shell=True, stdout = subprocess.PIPE)
+          
+linetype = 0
+i = 0
+filename = ""
+for line in p.stdout:
+    if linetype == 0:
+       if i >= len(toprocess):
+          break
+       filename = toprocess[i]
+       output_filename = os.path.join(options.output_dir, filename + ".features")
+       f = open(output_filename, "w")
+       f.write(line)
+       linetype = 1
+       i += 1
+    else:
+       f.write(line)
+       f.close()
+       linetype = 0
